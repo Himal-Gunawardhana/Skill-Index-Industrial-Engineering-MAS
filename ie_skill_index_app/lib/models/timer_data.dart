@@ -3,12 +3,14 @@ class TimerData {
   double elapsedSeconds;
   bool isRunning;
   bool hasRun; // Track if this timer has been used
+  bool isLocked; // Track if this timer is locked
 
   TimerData({
     required this.index,
     this.elapsedSeconds = 0.0,
     this.isRunning = false,
     this.hasRun = false,
+    this.isLocked = true, // Locked by default
   });
 
   Map<String, dynamic> toMap() {
@@ -17,6 +19,7 @@ class TimerData {
       'elapsedSeconds': elapsedSeconds,
       'isRunning': isRunning,
       'hasRun': hasRun,
+      'isLocked': isLocked,
     };
   }
 
@@ -26,6 +29,7 @@ class TimerData {
       elapsedSeconds: (map['elapsedSeconds'] ?? 0).toDouble(),
       isRunning: map['isRunning'] ?? false,
       hasRun: map['hasRun'] ?? false,
+      isLocked: map['isLocked'] ?? true,
     );
   }
 }

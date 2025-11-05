@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/api_service.dart';
 import 'register_screen.dart';
 import 'home_screen.dart';
-import 'firebase_diagnostic_screen.dart';
+import 'admin_login_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -84,20 +84,32 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    'IE Skill Index',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onLongPress: () {
+                      // Hidden admin access via long press
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AdminLoginScreen(),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Text(
+                          'IE Skill Index',
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Industrial Engineering Performance Tracker',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[600]),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Industrial Engineering Performance Tracker',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 48),
                   TextFormField(
@@ -176,50 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text('Register'),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Pre-fill admin credentials
-                            setState(() {
-                              _emailController.text = 'admin@example.com';
-                              _passwordController.text = '';
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Enter your admin password and click Login'),
-                                duration: Duration(seconds: 2),
-                                backgroundColor: Colors.blue,
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.admin_panel_settings, size: 18),
-                          label: const Text('Admin'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
                     ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const FirebaseDiagnosticScreen(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.troubleshoot),
-                    label: const Text('Firebase Diagnostics'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
                   ),
                 ],
               ),

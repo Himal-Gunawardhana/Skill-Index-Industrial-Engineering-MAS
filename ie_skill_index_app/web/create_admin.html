@@ -1,193 +1,214 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Create Admin User - IE Skill Index</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 50px auto;
-      padding: 20px;
-      background: #f5f5f5;
-    }
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #1976d2;
-      margin-bottom: 20px;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
-    button {
-      width: 100%;
-      padding: 15px;
-      background: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background: #1565c0;
-    }
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    .message {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 5px;
-      display: none;
-    }
-    .success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-    .error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-    .info {
-      background: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🔧 Create Admin User</h1>
-    
-    <div class="info">
-      <strong>Instructions:</strong><br>
-      1. Make sure Email/Password authentication is enabled in Firebase Console<br>
-      2. Make sure Firestore database is created<br>
-      3. Fill in the form below to create your admin account<br>
-      4. Use this account to login and manage styles/operations
+  <head>
+    <title>Create Admin User - IE Skill Index</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #1976d2;
+        margin-bottom: 20px;
+      }
+      input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+      button {
+        width: 100%;
+        padding: 15px;
+        background: #1976d2;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:hover {
+        background: #1565c0;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .message {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        display: none;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 Create Admin User</h1>
+
+      <div class="info">
+        <strong>Instructions:</strong><br />
+        1. Make sure Email/Password authentication is enabled in Firebase
+        Console<br />
+        2. Make sure Firestore database is created<br />
+        3. Fill in the form below to create your admin account<br />
+        4. Use this account to login and manage styles/operations
+      </div>
+
+      <form id="adminForm">
+        <input type="text" id="name" placeholder="Admin Name" required />
+        <input type="email" id="email" placeholder="Admin Email" required />
+        <input
+          type="password"
+          id="password"
+          placeholder="Password (min 6 characters)"
+          required
+          minlength="6"
+        />
+        <button type="submit" id="createBtn">Create Admin User</button>
+      </form>
+
+      <div id="message" class="message"></div>
     </div>
 
-    <form id="adminForm">
-      <input type="text" id="name" placeholder="Admin Name" required>
-      <input type="email" id="email" placeholder="Admin Email" required>
-      <input type="password" id="password" placeholder="Password (min 6 characters)" required minlength="6">
-      <button type="submit" id="createBtn">Create Admin User</button>
-    </form>
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCH_1AIHw6KQRl_l961rpFTSaEFKPkZGxw",
+        authDomain: "ie-skill-index.firebaseapp.com",
+        projectId: "ie-skill-index",
+        storageBucket: "ie-skill-index.firebasestorage.app",
+        messagingSenderId: "600671008111",
+        appId: "1:600671008111:web:709d08386b58f52000649a",
+      };
 
-    <div id="message" class="message"></div>
-  </div>
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
 
-  <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: 'AIzaSyCH_1AIHw6KQRl_l961rpFTSaEFKPkZGxw',
-      authDomain: 'ie-skill-index.firebaseapp.com',
-      projectId: 'ie-skill-index',
-      storageBucket: 'ie-skill-index.firebasestorage.app',
-      messagingSenderId: '600671008111',
-      appId: '1:600671008111:web:709d08386b58f52000649a'
-    };
+      const form = document.getElementById("adminForm");
+      const message = document.getElementById("message");
+      const createBtn = document.getElementById("createBtn");
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const form = document.getElementById('adminForm');
-    const message = document.getElementById('message');
-    const createBtn = document.getElementById('createBtn');
-
-    function showMessage(text, type) {
-      message.textContent = text;
-      message.className = 'message ' + type;
-      message.style.display = 'block';
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      createBtn.disabled = true;
-      createBtn.textContent = 'Creating...';
-      message.style.display = 'none';
-
-      try {
-        console.log('Creating user account...');
-        // Create user account
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-        
-        console.log('User created:', user.uid);
-        console.log('Creating Firestore document...');
-        
-        // Create user document in Firestore with admin flag
-        await db.collection('users').doc(user.uid).set({
-          name: name,
-          email: email,
-          isAdmin: true,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        console.log('Admin user created successfully!');
-        showMessage(`✅ Admin user created successfully!\n\nEmail: ${email}\nPassword: ${password}\n\nYou can now login to the app with these credentials.`, 'success');
-        
-        // Sign out the user
-        await auth.signOut();
-        
-        // Reset form
-        form.reset();
-        
-      } catch (error) {
-        console.error('Error:', error);
-        let errorMessage = 'Error: ' + error.message;
-        
-        if (error.code === 'auth/email-already-in-use') {
-          errorMessage = '❌ This email is already registered. Try logging in instead.';
-        } else if (error.code === 'auth/invalid-email') {
-          errorMessage = '❌ Invalid email address.';
-        } else if (error.code === 'auth/weak-password') {
-          errorMessage = '❌ Password is too weak. Use at least 6 characters.';
-        } else if (error.code === 'auth/operation-not-allowed') {
-          errorMessage = '❌ Email/Password authentication is not enabled in Firebase Console.\n\nGo to: https://console.firebase.google.com/project/ie-skill-index/authentication/providers\nAnd enable Email/Password sign-in.';
-        } else if (error.message.includes('Missing or insufficient permissions')) {
-          errorMessage = '❌ Firestore is not set up or has wrong security rules.\n\nGo to: https://console.firebase.google.com/project/ie-skill-index/firestore\nAnd create a database in test mode.';
-        }
-        
-        showMessage(errorMessage, 'error');
-      } finally {
-        createBtn.disabled = false;
-        createBtn.textContent = 'Create Admin User';
+      function showMessage(text, type) {
+        message.textContent = text;
+        message.className = "message " + type;
+        message.style.display = "block";
       }
-    });
 
-    // Check Firebase connection on load
-    window.addEventListener('load', () => {
-      console.log('Firebase initialized with project:', firebaseConfig.projectId);
-    });
-  </script>
-</body>
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        createBtn.disabled = true;
+        createBtn.textContent = "Creating...";
+        message.style.display = "none";
+
+        try {
+          console.log("Creating user account...");
+          // Create user account
+          const userCredential = await auth.createUserWithEmailAndPassword(
+            email,
+            password
+          );
+          const user = userCredential.user;
+
+          console.log("User created:", user.uid);
+          console.log("Creating Firestore document...");
+
+          // Create user document in Firestore with admin flag
+          await db.collection("users").doc(user.uid).set({
+            name: name,
+            email: email,
+            isAdmin: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+
+          console.log("Admin user created successfully!");
+          showMessage(
+            `✅ Admin user created successfully!\n\nEmail: ${email}\nPassword: ${password}\n\nYou can now login to the app with these credentials.`,
+            "success"
+          );
+
+          // Sign out the user
+          await auth.signOut();
+
+          // Reset form
+          form.reset();
+        } catch (error) {
+          console.error("Error:", error);
+          let errorMessage = "Error: " + error.message;
+
+          if (error.code === "auth/email-already-in-use") {
+            errorMessage =
+              "❌ This email is already registered. Try logging in instead.";
+          } else if (error.code === "auth/invalid-email") {
+            errorMessage = "❌ Invalid email address.";
+          } else if (error.code === "auth/weak-password") {
+            errorMessage =
+              "❌ Password is too weak. Use at least 6 characters.";
+          } else if (error.code === "auth/operation-not-allowed") {
+            errorMessage =
+              "❌ Email/Password authentication is not enabled in Firebase Console.\n\nGo to: https://console.firebase.google.com/project/ie-skill-index/authentication/providers\nAnd enable Email/Password sign-in.";
+          } else if (
+            error.message.includes("Missing or insufficient permissions")
+          ) {
+            errorMessage =
+              "❌ Firestore is not set up or has wrong security rules.\n\nGo to: https://console.firebase.google.com/project/ie-skill-index/firestore\nAnd create a database in test mode.";
+          }
+
+          showMessage(errorMessage, "error");
+        } finally {
+          createBtn.disabled = false;
+          createBtn.textContent = "Create Admin User";
+        }
+      });
+
+      // Check Firebase connection on load
+      window.addEventListener("load", () => {
+        console.log(
+          "Firebase initialized with project:",
+          firebaseConfig.projectId
+        );
+      });
+    </script>
+  </body>
 </html>

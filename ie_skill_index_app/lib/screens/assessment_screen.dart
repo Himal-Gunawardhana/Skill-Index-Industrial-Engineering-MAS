@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import '../providers/assessment_provider.dart';
 import '../widgets/timer_widget.dart';
 import '../widgets/custom_app_bar.dart';
@@ -134,51 +135,76 @@ class _AssessmentScreenContentState extends State<AssessmentScreenContent> {
                 children: [
                   // Style Selection
                   _buildSectionTitle('Style Selection'),
-                  DropdownButtonFormField<String>(
-                    value: provider.selectedStyleId,
-                    decoration: const InputDecoration(
-                      labelText: 'Select Style',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: provider.styles.map((style) {
-                      return DropdownMenuItem(
-                        value: style.id,
-                        child: Text(style.name),
+                  DropdownSearch<String>(
+                    items: (filter, infiniteScrollProps) =>
+                        provider.styles.map((style) => style.id).toList(),
+                    itemAsString: (String? id) {
+                      if (id == null) return '';
+                      final style = provider.styles.firstWhere(
+                        (s) => s.id == id,
+                        orElse: () => provider.styles.first,
                       );
-                    }).toList(),
+                      return style.name;
+                    },
+                    selectedItem: provider.selectedStyleId,
+                    popupProps: PopupProps.menu(
+                      showSearchBox: true,
+                      searchFieldProps: const TextFieldProps(
+                        decoration: InputDecoration(
+                          hintText: 'Search styles...',
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                    ),
+                    decoratorProps: const DropDownDecoratorProps(
+                      decoration: InputDecoration(
+                        labelText: 'Select Style',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                     onChanged: (value) {
-                      provider.setSelectedStyle(value!);
+                      if (value != null) {
+                        provider.setSelectedStyle(value);
+                      }
                     },
                     validator: (value) =>
                         value == null ? 'Please select a style' : null,
                   ),
-                  if (provider.selectedStyle != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      'SMV: ${provider.selectedStyle!.smv.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
                   const SizedBox(height: 16),
 
                   // Operation Selection
-                  DropdownButtonFormField<String>(
-                    value: provider.selectedOperationId,
-                    decoration: const InputDecoration(
-                      labelText: 'Select Operation',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: provider.operations.map((operation) {
-                      return DropdownMenuItem(
-                        value: operation.id,
-                        child: Text(operation.name),
+                  DropdownSearch<String>(
+                    items: (filter, infiniteScrollProps) => provider.operations
+                        .map((operation) => operation.id)
+                        .toList(),
+                    itemAsString: (String? id) {
+                      if (id == null) return '';
+                      final operation = provider.operations.firstWhere(
+                        (o) => o.id == id,
+                        orElse: () => provider.operations.first,
                       );
-                    }).toList(),
+                      return '${operation.name} (SMV: ${operation.smv.toStringAsFixed(2)})';
+                    },
+                    selectedItem: provider.selectedOperationId,
+                    popupProps: PopupProps.menu(
+                      showSearchBox: true,
+                      searchFieldProps: const TextFieldProps(
+                        decoration: InputDecoration(
+                          hintText: 'Search operations...',
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                    ),
+                    decoratorProps: const DropDownDecoratorProps(
+                      decoration: InputDecoration(
+                        labelText: 'Select Operation',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                     onChanged: (value) {
-                      provider.setSelectedOperation(value!);
+                      if (value != null) {
+                        provider.setSelectedOperation(value);
+                      }
                     },
                     validator: (value) =>
                         value == null ? 'Please select an operation' : null,
@@ -190,41 +216,60 @@ class _AssessmentScreenContentState extends State<AssessmentScreenContent> {
                   Row(
                     children: [
                       Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: provider.selectedShift,
-                          decoration: const InputDecoration(
-                            labelText: 'Shift',
-                            border: OutlineInputBorder(),
+                        child: DropdownSearch<String>(
+                          items: (filter, infiniteScrollProps) => ['A', 'B'],
+                          itemAsString: (String? shift) =>
+                              shift != null ? 'Shift $shift' : '',
+                          selectedItem: provider.selectedShift,
+                          popupProps: PopupProps.menu(
+                            showSearchBox: true,
+                            searchFieldProps: const TextFieldProps(
+                              decoration: InputDecoration(
+                                hintText: 'Search shift...',
+                                prefixIcon: Icon(Icons.search),
+                              ),
+                            ),
                           ),
-                          items: ['A', 'B'].map((shift) {
-                            return DropdownMenuItem(
-                              value: shift,
-                              child: Text('Shift $shift'),
-                            );
-                          }).toList(),
+                          decoratorProps: const DropDownDecoratorProps(
+                            decoration: InputDecoration(
+                              labelText: 'Shift',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
                           onChanged: (value) {
-                            provider.setSelectedShift(value!);
+                            if (value != null) {
+                              provider.setSelectedShift(value);
+                            }
                           },
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: DropdownButtonFormField<int>(
-                          value: provider.selectedModule,
-                          decoration: const InputDecoration(
-                            labelText: 'Module',
-                            border: OutlineInputBorder(),
+                        child: DropdownSearch<int>(
+                          items: (filter, infiniteScrollProps) =>
+                              List.generate(26, (index) => index + 1),
+                          itemAsString: (int? module) =>
+                              module != null ? 'Module $module' : '',
+                          selectedItem: provider.selectedModule,
+                          popupProps: PopupProps.menu(
+                            showSearchBox: true,
+                            searchFieldProps: const TextFieldProps(
+                              decoration: InputDecoration(
+                                hintText: 'Search module...',
+                                prefixIcon: Icon(Icons.search),
+                              ),
+                            ),
                           ),
-                          items: List.generate(26, (index) => index + 1).map((
-                            module,
-                          ) {
-                            return DropdownMenuItem(
-                              value: module,
-                              child: Text('Module $module'),
-                            );
-                          }).toList(),
+                          decoratorProps: const DropDownDecoratorProps(
+                            decoration: InputDecoration(
+                              labelText: 'Module',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
                           onChanged: (value) {
-                            provider.setSelectedModule(value!);
+                            if (value != null) {
+                              provider.setSelectedModule(value);
+                            }
                           },
                         ),
                       ),

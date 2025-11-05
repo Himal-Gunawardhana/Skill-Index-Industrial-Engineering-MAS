@@ -67,6 +67,13 @@ class FirebaseService {
         .toList();
   }
 
+  Future<List<UserModel>> getUsers() async {
+    final snapshot = await _firestore.collection('users').get();
+    return snapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+        .toList();
+  }
+
   // Style Methods
   Future<List<StyleModel>> getStyles() async {
     final snapshot = await _firestore.collection('styles').get();
@@ -75,15 +82,12 @@ class FirebaseService {
         .toList();
   }
 
-  Future<void> addStyle(String name, double smv) async {
-    await _firestore.collection('styles').add({'name': name, 'smv': smv});
+  Future<void> addStyle(String name) async {
+    await _firestore.collection('styles').add({'name': name});
   }
 
-  Future<void> updateStyle(String id, String name, double smv) async {
-    await _firestore.collection('styles').doc(id).update({
-      'name': name,
-      'smv': smv,
-    });
+  Future<void> updateStyle(String id, String name) async {
+    await _firestore.collection('styles').doc(id).update({'name': name});
   }
 
   Future<void> deleteStyle(String id) async {
@@ -98,10 +102,11 @@ class FirebaseService {
         .toList();
   }
 
-  Future<void> addOperation(String name, String description) async {
+  Future<void> addOperation(String name, String description, double smv) async {
     await _firestore.collection('operations').add({
       'name': name,
       'description': description,
+      'smv': smv,
     });
   }
 
@@ -109,10 +114,12 @@ class FirebaseService {
     String id,
     String name,
     String description,
+    double smv,
   ) async {
     await _firestore.collection('operations').doc(id).update({
       'name': name,
       'description': description,
+      'smv': smv,
     });
   }
 

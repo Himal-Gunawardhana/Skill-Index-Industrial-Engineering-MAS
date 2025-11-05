@@ -112,9 +112,6 @@ class _StylesTabState extends State<StylesTab> {
 
   Future<void> _showAddEditDialog({StyleModel? style}) async {
     final nameController = TextEditingController(text: style?.name ?? '');
-    final smvController = TextEditingController(
-      text: style?.smv.toString() ?? '',
-    );
 
     await showDialog(
       context: context,
@@ -130,15 +127,6 @@ class _StylesTabState extends State<StylesTab> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: smvController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'SMV (Standard Minute Value)',
-                border: OutlineInputBorder(),
-              ),
-            ),
           ],
         ),
         actions: [
@@ -149,12 +137,11 @@ class _StylesTabState extends State<StylesTab> {
           ElevatedButton(
             onPressed: () async {
               final name = nameController.text.trim();
-              final smv = double.tryParse(smvController.text.trim());
 
-              if (name.isEmpty || smv == null) {
+              if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Please fill all fields correctly'),
+                    content: Text('Please enter style name'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -163,9 +150,9 @@ class _StylesTabState extends State<StylesTab> {
 
               try {
                 if (style == null) {
-                  await _firebaseService.addStyle(name, smv);
+                  await _firebaseService.addStyle(name);
                 } else {
-                  await _firebaseService.updateStyle(style.id, name, smv);
+                  await _firebaseService.updateStyle(style.id, name);
                 }
                 Navigator.pop(context);
                 _loadStyles();
@@ -262,7 +249,6 @@ class _StylesTabState extends State<StylesTab> {
                       style.name,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text('SMV: ${style.smv.toStringAsFixed(2)}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -325,31 +311,48 @@ class _OperationsTabState extends State<OperationsTab> {
     final descController = TextEditingController(
       text: operation?.description ?? '',
     );
+    final smvController = TextEditingController(
+      text: operation != null ? operation.smv.toString() : '',
+    );
 
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(operation == null ? 'Add Operation' : 'Edit Operation'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Operation Name',
-                border: OutlineInputBorder(),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Operation Name',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descController,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 16),
+              TextField(
+                controller: smvController,
+                decoration: const InputDecoration(
+                  labelText: 'SMV (Standard Minute Value)',
+                  border: OutlineInputBorder(),
+                  hintText: 'e.g., 0.45',
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
               ),
-              maxLines: 2,
-            ),
-          ],
+              const SizedBox(height: 16),
+              TextField(
+                controller: descController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 2,
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -360,6 +363,7 @@ class _OperationsTabState extends State<OperationsTab> {
             onPressed: () async {
               final name = nameController.text.trim();
               final description = descController.text.trim();
+              final smv = double.tryParse(smvController.text.trim()) ?? 0.0;
 
               if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -371,14 +375,25 @@ class _OperationsTabState extends State<OperationsTab> {
                 return;
               }
 
+              if (smv <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a valid SMV value'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
               try {
                 if (operation == null) {
-                  await _firebaseService.addOperation(name, description);
+                  await _firebaseService.addOperation(name, description, smv);
                 } else {
                   await _firebaseService.updateOperation(
                     operation.id,
                     name,
                     description,
+                    smv,
                   );
                 }
                 Navigator.pop(context);
@@ -476,7 +491,21 @@ class _OperationsTabState extends State<OperationsTab> {
                       operation.name,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text(operation.description),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(operation.description),
+                        const SizedBox(height: 4),
+                        Text(
+                          'SMV: ${operation.smv.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                    isThreeLine: true,
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

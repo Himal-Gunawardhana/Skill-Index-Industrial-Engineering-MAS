@@ -34,9 +34,14 @@ class AssessmentProvider with ChangeNotifier {
   AssessmentModel? lastSavedAssessment;
 
   AssessmentProvider() {
-    // Initialize 10 timers
+    // Initialize 10 timers - only first one unlocked
     for (int i = 0; i < 10; i++) {
-      timers.add(TimerData(index: i));
+      timers.add(
+        TimerData(
+          index: i,
+          isLocked: i != 0, // Only first timer (index 0) is unlocked
+        ),
+      );
     }
   }
 
@@ -146,6 +151,12 @@ class AssessmentProvider with ChangeNotifier {
     _activeTimers[index]?.cancel();
     _activeTimers[index] = null;
     timers[index].isRunning = false;
+
+    // Unlock next timer if exists when paused
+    if (index < timers.length - 1) {
+      timers[index + 1].isLocked = false;
+    }
+
     notifyListeners();
   }
 
@@ -153,6 +164,12 @@ class AssessmentProvider with ChangeNotifier {
     _activeTimers[index]?.cancel();
     _activeTimers[index] = null;
     timers[index].isRunning = false;
+
+    // Unlock next timer if exists
+    if (index < timers.length - 1) {
+      timers[index + 1].isLocked = false;
+    }
+
     notifyListeners();
   }
 
@@ -200,11 +217,11 @@ class AssessmentProvider with ChangeNotifier {
       if (currentUser == null) {
         throw Exception('User not logged in');
       }
-      
+
       final userData = await _firebaseService.getUserData(currentUser.uid);
       final userName = userData?.name ?? 'Unknown';
       final firstName = userName.split(' ').first; // Extract first name
-      final smv = selectedStyle!.smv;
+      final smv = selectedOperation!.smv; // Get SMV from selected operation
       final ssv = smv * 60; // SSV = SMV * 60
       final avgTime = getAverageTime();
       final efficiency = avgTime > 0 ? (ssv / avgTime) * 100 : 0.0;

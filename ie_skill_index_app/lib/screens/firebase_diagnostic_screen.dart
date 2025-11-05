@@ -54,7 +54,8 @@ class _FirebaseDiagnosticScreenState extends State<FirebaseDiagnosticScreen> {
       // Try a test registration (will fail but we can see why)
       try {
         await auth.createUserWithEmailAndPassword(
-          email: 'test_diagnostic_${DateTime.now().millisecondsSinceEpoch}@test.com',
+          email:
+              'test_diagnostic_${DateTime.now().millisecondsSinceEpoch}@test.com',
           password: 'test123456',
         );
         // If this succeeds, delete the test user
@@ -184,148 +185,149 @@ class _FirebaseDiagnosticScreenState extends State<FirebaseDiagnosticScreen> {
               ),
             )
           : diagnosticResults.isEmpty
-              ? const Center(child: Text('No diagnostic results'))
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    const Text(
-                      'Firebase Configuration Check',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'This diagnostic will tell you exactly what needs to be fixed in Firebase Console.',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    const SizedBox(height: 24),
-                    ...diagnosticResults.entries.map((entry) {
-                      final data = entry.value as Map<String, dynamic>;
-                      final status = data['status'] as String;
-                      final message = data['message'] as String;
+          ? const Center(child: Text('No diagnostic results'))
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                const Text(
+                  'Firebase Configuration Check',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'This diagnostic will tell you exactly what needs to be fixed in Firebase Console.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 24),
+                ...diagnosticResults.entries.map((entry) {
+                  final data = entry.value as Map<String, dynamic>;
+                  final status = data['status'] as String;
+                  final message = data['message'] as String;
 
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
-                              Row(
+                              Icon(
+                                _getStatusIcon(status),
+                                color: _getStatusColor(status),
+                                size: 32,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _getCheckTitle(entry.key),
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      message,
+                                      style: TextStyle(
+                                        color: _getStatusColor(status),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (data.containsKey('project_id')) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Project ID: ${data['project_id']}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                          if (data.containsKey('code')) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Error Code: ${data['code']}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                          if (data.containsKey('details')) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Details: ${data['details']}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                          if (data.containsKey('solution')) ...[
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
                                 children: [
-                                  Icon(
-                                    _getStatusIcon(status),
-                                    color: _getStatusColor(status),
-                                    size: 32,
+                                  const Icon(
+                                    Icons.lightbulb_outline,
+                                    color: Colors.blue,
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: 8),
                                   Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _getCheckTitle(entry.key),
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          message,
-                                          style: TextStyle(
-                                            color: _getStatusColor(status),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
+                                    child: Text(
+                                      data['solution'],
+                                      style: const TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                              if (data.containsKey('project_id')) ...[
-                                const SizedBox(height: 8),
-                                Text('Project ID: ${data['project_id']}',
-                                    style: const TextStyle(fontSize: 12)),
-                              ],
-                              if (data.containsKey('code')) ...[
-                                const SizedBox(height: 8),
-                                Text('Error Code: ${data['code']}',
-                                    style: const TextStyle(fontSize: 12)),
-                              ],
-                              if (data.containsKey('details')) ...[
-                                const SizedBox(height: 8),
-                                Text('Details: ${data['details']}',
-                                    style: const TextStyle(fontSize: 12)),
-                              ],
-                              if (data.containsKey('solution')) ...[
-                                const SizedBox(height: 12),
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade50,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.lightbulb_outline,
-                                          color: Colors.blue),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          data['solution'],
-                                          style: const TextStyle(
-                                            color: Colors.blue,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 24),
-                    const Card(
-                      color: Colors.blue,
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '📋 Quick Fix Steps:',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 12),
-                            Text(
-                              '1. Go to Firebase Console\n'
-                              '2. Select project: ie-skill-index\n'
-                              '3. Enable Authentication → Email/Password\n'
-                              '4. Create Firestore Database (Test mode)\n'
-                              '5. Return here and click refresh',
-                              style: TextStyle(
-                                color: Colors.white,
-                                height: 1.5,
-                              ),
                             ),
                           ],
-                        ),
+                        ],
                       ),
                     ),
-                  ],
+                  );
+                }),
+                const SizedBox(height: 24),
+                const Card(
+                  color: Colors.blue,
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '📋 Quick Fix Steps:',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          '1. Go to Firebase Console\n'
+                          '2. Select project: ie-skill-index\n'
+                          '3. Enable Authentication → Email/Password\n'
+                          '4. Create Firestore Database (Test mode)\n'
+                          '5. Return here and click refresh',
+                          style: TextStyle(color: Colors.white, height: 1.5),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
+              ],
+            ),
     );
   }
 

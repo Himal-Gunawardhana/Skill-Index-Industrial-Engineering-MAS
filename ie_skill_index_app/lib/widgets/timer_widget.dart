@@ -21,10 +21,15 @@ class TimerWidget extends StatelessWidget {
         final timer = provider.timers[timerIndex];
         final isRunning = timer.isRunning;
         final hasRun = timer.hasRun;
+        final isLocked = timer.isLocked;
 
         return Card(
           elevation: hasRun ? 3 : 1,
-          color: hasRun ? Colors.blue[50] : null,
+          color: isLocked
+              ? Colors.grey[200]
+              : hasRun
+              ? Colors.blue[50]
+              : null,
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Row(
@@ -34,17 +39,23 @@ class TimerWidget extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: hasRun ? Colors.blue : Colors.grey[300],
+                    color: isLocked
+                        ? Colors.grey[400]
+                        : hasRun
+                        ? Colors.blue
+                        : Colors.grey[300],
                     shape: BoxShape.circle,
                   ),
                   child: Center(
-                    child: Text(
-                      '${timerIndex + 1}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: hasRun ? Colors.white : Colors.black87,
-                      ),
-                    ),
+                    child: isLocked
+                        ? const Icon(Icons.lock, size: 16, color: Colors.white)
+                        : Text(
+                            '${timerIndex + 1}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: hasRun ? Colors.white : Colors.black87,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -66,67 +77,75 @@ class TimerWidget extends StatelessWidget {
                           ?.copyWith(
                             fontFamily: 'monospace',
                             fontWeight: FontWeight.bold,
+                            color: isLocked ? Colors.grey : Colors.black,
                           ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
 
-                // Control buttons
-                if (!isRunning && timer.elapsedSeconds == 0)
-                  // Start button (only when timer is at 0)
-                  IconButton(
-                    icon: const Icon(Icons.play_arrow),
-                    color: Colors.green,
-                    onPressed: () {
-                      provider.startTimer(timerIndex);
-                    },
-                    tooltip: 'Start',
-                  ),
+                // Control buttons - disabled if locked
+                if (!isLocked) ...[
+                  if (!isRunning && timer.elapsedSeconds == 0)
+                    // Start button (only when timer is at 0)
+                    IconButton(
+                      icon: const Icon(Icons.play_arrow),
+                      color: Colors.green,
+                      onPressed: () {
+                        provider.startTimer(timerIndex);
+                      },
+                      tooltip: 'Start',
+                    ),
 
-                if (isRunning)
-                  // Pause button (when running)
-                  IconButton(
-                    icon: const Icon(Icons.pause),
-                    color: Colors.orange,
-                    onPressed: () {
-                      provider.pauseTimer(timerIndex);
-                    },
-                    tooltip: 'Pause',
-                  ),
+                  if (isRunning)
+                    // Pause button (when running)
+                    IconButton(
+                      icon: const Icon(Icons.pause),
+                      color: Colors.orange,
+                      onPressed: () {
+                        provider.pauseTimer(timerIndex);
+                      },
+                      tooltip: 'Pause',
+                    ),
 
-                if (!isRunning && timer.elapsedSeconds > 0)
-                  // Resume button (when paused)
-                  IconButton(
-                    icon: const Icon(Icons.play_arrow),
-                    color: Colors.green,
-                    onPressed: () {
-                      provider.startTimer(timerIndex);
-                    },
-                    tooltip: 'Resume',
-                  ),
+                  if (!isRunning && timer.elapsedSeconds > 0)
+                    // Resume button (when paused)
+                    IconButton(
+                      icon: const Icon(Icons.play_arrow),
+                      color: Colors.green,
+                      onPressed: () {
+                        provider.startTimer(timerIndex);
+                      },
+                      tooltip: 'Resume',
+                    ),
 
-                if (!isRunning && timer.elapsedSeconds > 0)
-                  // Stop button (when paused, to finalize)
-                  IconButton(
-                    icon: const Icon(Icons.stop),
-                    color: Colors.red,
-                    onPressed: () {
-                      provider.stopTimer(timerIndex);
-                    },
-                    tooltip: 'Stop',
-                  ),
+                  if (!isRunning && timer.elapsedSeconds > 0)
+                    // Stop button (when paused, to finalize)
+                    IconButton(
+                      icon: const Icon(Icons.stop),
+                      color: Colors.red,
+                      onPressed: () {
+                        provider.stopTimer(timerIndex);
+                      },
+                      tooltip: 'Stop',
+                    ),
 
-                if (timer.elapsedSeconds > 0)
-                  // Reset button
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    color: Colors.blue,
-                    onPressed: () {
-                      provider.resetTimer(timerIndex);
-                    },
-                    tooltip: 'Reset',
-                  ),
+                  if (timer.elapsedSeconds > 0)
+                    // Reset button
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      color: Colors.blue,
+                      onPressed: () {
+                        provider.resetTimer(timerIndex);
+                      },
+                      tooltip: 'Reset',
+                    ),
+                ] else ...[
+                  // Show locked icon when locked
+                  const SizedBox(width: 48),
+                  Icon(Icons.lock_outline, color: Colors.grey[600]),
+                  const SizedBox(width: 48),
+                ],
               ],
             ),
           ),

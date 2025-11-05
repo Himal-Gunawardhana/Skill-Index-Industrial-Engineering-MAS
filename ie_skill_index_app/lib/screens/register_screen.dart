@@ -36,33 +36,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       print('Starting registration for: ${_emailController.text.trim()}');
-      
+
       // Add timeout to prevent infinite loading
-      final credential = await _firebaseService.registerUser(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Registration timed out. Please check your internet connection and Firebase settings.');
-        },
-      );
+      final credential = await _firebaseService
+          .registerUser(
+            _emailController.text.trim(),
+            _passwordController.text.trim(),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              throw Exception(
+                'Registration timed out. Please check your internet connection and Firebase settings.',
+              );
+            },
+          );
       print('User created successfully: ${credential.user?.uid}');
       print('User created successfully: ${credential.user?.uid}');
 
       // Create user data in Firestore
       print('Creating user data in Firestore...');
-      await _firebaseService.createUserData(
-        credential.user!.uid,
-        _nameController.text.trim(),
-        _emailController.text.trim(),
-        isAdmin: false,
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Firestore write timed out. Please check if Firestore is enabled.');
-        },
-      );
+      await _firebaseService
+          .createUserData(
+            credential.user!.uid,
+            _nameController.text.trim(),
+            _emailController.text.trim(),
+            isAdmin: false,
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              throw Exception(
+                'Firestore write timed out. Please check if Firestore is enabled.',
+              );
+            },
+          );
       print('User data created successfully in Firestore');
 
       if (mounted) {
