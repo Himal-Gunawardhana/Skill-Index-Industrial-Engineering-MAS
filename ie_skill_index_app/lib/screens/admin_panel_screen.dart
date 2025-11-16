@@ -314,6 +314,9 @@ class _OperationsTabState extends State<OperationsTab> {
     final smvController = TextEditingController(
       text: operation != null ? operation.smv.toString() : '',
     );
+    final machineTypeController = TextEditingController(
+      text: operation?.machineType ?? '',
+    );
 
     await showDialog(
       context: context,
@@ -344,6 +347,15 @@ class _OperationsTabState extends State<OperationsTab> {
               ),
               const SizedBox(height: 16),
               TextField(
+                controller: machineTypeController,
+                decoration: const InputDecoration(
+                  labelText: 'Machine Type',
+                  border: OutlineInputBorder(),
+                  hintText: 'e.g., Single Needle, Overlock',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
                 controller: descController,
                 decoration: const InputDecoration(
                   labelText: 'Description',
@@ -364,6 +376,7 @@ class _OperationsTabState extends State<OperationsTab> {
               final name = nameController.text.trim();
               final description = descController.text.trim();
               final smv = double.tryParse(smvController.text.trim()) ?? 0.0;
+              final machineType = machineTypeController.text.trim();
 
               if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -385,15 +398,31 @@ class _OperationsTabState extends State<OperationsTab> {
                 return;
               }
 
+              if (machineType.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter machine type'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
               try {
                 if (operation == null) {
-                  await _firebaseService.addOperation(name, description, smv);
+                  await _firebaseService.addOperation(
+                    name,
+                    description,
+                    smv,
+                    machineType,
+                  );
                 } else {
                   await _firebaseService.updateOperation(
                     operation.id,
                     name,
                     description,
                     smv,
+                    machineType,
                   );
                 }
                 Navigator.pop(context);
@@ -503,6 +532,16 @@ class _OperationsTabState extends State<OperationsTab> {
                             fontSize: 12,
                           ),
                         ),
+                        if (operation.machineType.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Machine: ${operation.machineType}',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                     isThreeLine: true,

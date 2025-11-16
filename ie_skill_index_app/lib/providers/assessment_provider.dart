@@ -222,6 +222,7 @@ class AssessmentProvider with ChangeNotifier {
       final userName = userData?.name ?? 'Unknown';
       final firstName = userName.split(' ').first; // Extract first name
       final smv = selectedOperation!.smv; // Get SMV from selected operation
+      final machineType = selectedOperation!.machineType; // Get machineType from selected operation
       final ssv = smv * 60; // SSV = SMV * 60
       final avgTime = getAverageTime();
       final efficiency = avgTime > 0 ? (ssv / avgTime) * 100 : 0.0;
@@ -245,6 +246,7 @@ class AssessmentProvider with ChangeNotifier {
         operationId: selectedOperationId!,
         operationName: selectedOperation!.name,
         smv: smv,
+        machineType: machineType,
         shift: selectedShift,
         teamMember: teamMember,
         epf: epf,

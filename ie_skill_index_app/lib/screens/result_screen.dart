@@ -118,6 +118,7 @@ class ResultScreen extends StatelessWidget {
               _buildInfoRow('Style', assessment.styleName),
               _buildInfoRow('Operation', assessment.operationName),
               _buildInfoRow('SMV', assessment.smv.toStringAsFixed(2)),
+              _buildInfoRow('Machine Type', assessment.machineType),
               _buildInfoRow('Team Member', assessment.teamMember),
               _buildInfoRow('EPF', assessment.epf),
               _buildInfoRow('Shift', assessment.shift),

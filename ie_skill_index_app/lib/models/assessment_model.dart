@@ -7,6 +7,7 @@ class AssessmentModel {
   final String operationId;
   final String operationName;
   final double smv;
+  final String machineType;
   final String shift; // A or B
   final String teamMember;
   final String epf;
@@ -29,6 +30,7 @@ class AssessmentModel {
     required this.operationId,
     required this.operationName,
     required this.smv,
+    this.machineType = '',
     required this.shift,
     required this.teamMember,
     required this.epf,
@@ -53,6 +55,7 @@ class AssessmentModel {
       operationId: map['operationId'] ?? '',
       operationName: map['operationName'] ?? '',
       smv: (map['smv'] ?? 0).toDouble(),
+      machineType: map['machineType'] ?? '',
       shift: map['shift'] ?? 'A',
       teamMember: map['teamMember'] ?? '',
       epf: map['epf'] ?? '',
@@ -77,6 +80,7 @@ class AssessmentModel {
       'operationId': operationId,
       'operationName': operationName,
       'smv': smv,
+      'machineType': machineType,
       'shift': shift,
       'teamMember': teamMember,
       'epf': epf,

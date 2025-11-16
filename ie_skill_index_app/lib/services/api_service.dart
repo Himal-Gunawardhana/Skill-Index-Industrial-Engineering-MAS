@@ -102,11 +102,17 @@ class FirebaseService {
         .toList();
   }
 
-  Future<void> addOperation(String name, String description, double smv) async {
+  Future<void> addOperation(
+    String name,
+    String description,
+    double smv,
+    String machineType,
+  ) async {
     await _firestore.collection('operations').add({
       'name': name,
       'description': description,
       'smv': smv,
+      'machineType': machineType,
     });
   }
 
@@ -115,11 +121,13 @@ class FirebaseService {
     String name,
     String description,
     double smv,
+    String machineType,
   ) async {
     await _firestore.collection('operations').doc(id).update({
       'name': name,
       'description': description,
       'smv': smv,
+      'machineType': machineType,
     });
   }
 
@@ -129,6 +137,20 @@ class FirebaseService {
 
   // Assessment Methods
   Future<void> saveAssessment(AssessmentModel assessment) async {
+    // Check for existing assessment with same EPF, styleId, and operationId
+    final existingAssessments = await _firestore
+        .collection('assessments')
+        .where('epf', isEqualTo: assessment.epf)
+        .where('styleId', isEqualTo: assessment.styleId)
+        .where('operationId', isEqualTo: assessment.operationId)
+        .get();
+
+    // Delete all existing assessments with same EPF, style, and operation
+    for (final doc in existingAssessments.docs) {
+      await doc.reference.delete();
+    }
+
+    // Save the new assessment
     await _firestore.collection('assessments').add(assessment.toMap());
   }
 

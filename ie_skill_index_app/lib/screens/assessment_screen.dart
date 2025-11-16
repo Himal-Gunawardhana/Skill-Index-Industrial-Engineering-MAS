@@ -183,7 +183,7 @@ class _AssessmentScreenContentState extends State<AssessmentScreenContent> {
                         (o) => o.id == id,
                         orElse: () => provider.operations.first,
                       );
-                      return '${operation.name} (SMV: ${operation.smv.toStringAsFixed(2)})';
+                      return operation.name;
                     },
                     selectedItem: provider.selectedOperationId,
                     popupProps: PopupProps.menu(
@@ -209,6 +209,49 @@ class _AssessmentScreenContentState extends State<AssessmentScreenContent> {
                     validator: (value) =>
                         value == null ? 'Please select an operation' : null,
                   ),
+                  
+                  // Display SMV and Machine Type when operation is selected
+                  if (provider.selectedOperation != null) ...[
+                    const SizedBox(height: 12),
+                    Card(
+                      color: Colors.blue[50],
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.timer, size: 16, color: Colors.blue),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'SMV: ${provider.selectedOperation!.smv.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.precision_manufacturing, size: 16, color: Colors.blue),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Machine Type: ${provider.selectedOperation!.machineType}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
 
                   // Shift, Module, IE Selection
